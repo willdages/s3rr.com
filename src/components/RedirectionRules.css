@@ -1,0 +1,16 @@
+pre {
+  overflow: scroll;
+}
+
+pre.redirectionRules {
+  padding: 1em;
+  background-color: #efefef;
+}
+
+mark {
+  background-color: #FFFACD;
+}
+
+mark.danger {
+  background-color: #FFC6C4;
+}

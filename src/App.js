@@ -1,75 +1,111 @@
 import React, { Component } from 'react';
-import RedirectionRules from './RedirectionRules';
-import logo from './logo.svg';
+import { MuiThemeProvider, createMuiTheme } from 'material-ui/styles';
+import { withStyles } from 'material-ui/styles';
+
+import Grid from 'material-ui/Grid';
+
+import AppHeader from './components/AppHeader';
+import RuleEntry from './components/RuleEntry';
+import RedirectionRules from './components/RedirectionRules';
+import RuleList from './components/RuleList';
+
 import './App.css';
 
-class App extends Component {
-
-  blankRule = {
-    protocol: '',
-    url: '',
-    code: 302,
-    permanent: true,
-    from: '',
-    to: ''
+const theme = createMuiTheme();
+const styles = theme => ({
+  root: {
+    flexGrow: 1,
+    marginTop: 30,
+    justify: 'center',
+    align: 'flex-start',
+    direction: 'row'
   }
+});
 
+class App extends Component {
   constructor (props) {
     super(props);
     this.state = {
       rules: [],
-      newRule: this.blankRule
+      selected: {},
+      selectedDestructively: false
     }
   }
 
-  handleSubmit = (e) => {
-    e.preventDefault();
+  handleAddRule = (rule) => {
     this.setState({
-      rules: [...this.state.rules, this.state.newRule],
-      newRule: this.blankRule
+      rules: [...this.state.rules, rule]
     });
-    this.refs.from.focus();
+  }
+
+  handleRemoveRule = (rule) => {
+    const { rules } = this.state;
+    const currentIndex = rules.indexOf(rule);
+    const newRules = [...rules];
+
+    if (currentIndex === -1) {
+      return;
+    }
+    newRules.splice(currentIndex, 1);
+    this.setState({
+      rules: newRules,
+      selected: {},
+      selectedDestructively: false
+    });
+  }
+
+  handleHover = (rule) => {
+    console.log('hover')
+    this.setState({
+      selected: rule
+    });
+  }
+
+  handleUnHover = () => {
+    console.log('unhover')
+    this.setState({
+      selected: {}
+    });
+  }
+
+  handleHoverDestructive = (rule) => {
+    console.log('hoverd')
+    this.setState({
+      selected: rule,
+      selectedDestructively: true
+    });
+  }
+
+  handleUnHoverDestructive = () => {
+    console.log('unhoverd')
+    this.setState({
+      selected: {},
+      selectedDestructively: false
+    });
   }
 
   render() {
     return (
-      <div className="App">
-        <div className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h2>S3 Redirection Rules Generator</h2>
-        </div>
-        <ul>
-          {this.state.rules.map(rule => <li key={rule.from}>{rule.from} --> {rule.to}</li>)}
-        </ul>
-        <RedirectionRules rules={this.state.rules} inProgressRule={this.state.newRule}/>
-        <form onSubmit={this.handleSubmit}>
-          <h3>Add Rule</h3>
-          <label>
-            Redirect from path:
-            <input ref="from" required placeholder="/campaign" value={this.state.newRule.from} onChange={(e) => {this.setState({newRule: { ...this.state.newRule, from: e.target.value} })}} />
-          </label>
-          Redirect to:
-          <label>
-            Protocol
-            <input placeholder="HTTPS" required value={this.state.newRule.protocol} onChange={(e) => {this.setState({newRule: { ...this.state.newRule, protocol: e.target.value} })}} />
-          </label>
-          <label>
-            URL
-            <input placeholder="domain.com" required value={this.state.newRule.url} onChange={(e) => {this.setState({newRule: { ...this.state.newRule, url: e.target.value} })}} />
-          </label>
-          <label>
-            Path
-            <input placeholder="/?utm_source=tal&utm_medium=podcast&utm_campaign=campaign" required value={this.state.newRule.to} onChange={(e) => {this.setState({newRule: { ...this.state.newRule, to: e.target.value} })}} />
-          </label>
-          <label>
-            PErmanent?
-            <input type="checkbox" required checked={this.state.newRule.permanent} onChange={(e) => {this.setState({newRule: { ...this.state.newRule, permanent: e.target.checked }})}} />
-          </label>
-          <button type="submit">Add This Rule</button>
-        </form>
-      </div>
+      <MuiThemeProvider theme={theme}>
+        <Grid container spacing={0} className="App" align="flex-start" justify="center">
+          <AppHeader />
+          <Grid container spacing={0} style={{paddingBottom: '2em'}} justify="center">
+            <Grid item xs={10} md={6}>
+              <RuleEntry onAddRule={this.handleAddRule} />
+            </Grid>
+          </Grid>
+          <Grid container spacing={0} style={{paddingBottom: '2em'}} justify="center">
+            <Grid item xs={10} md={4}>
+              <RuleList rules={this.state.rules} onHighlight={this.handleHover} onUnHighlight={this.handleUnHover} onUnHighlightDestructively={this.handleUnHoverDestructive} onHighlightDestructively={this.handleHoverDestructive} onRemoveRule={this.handleRemoveRule} />
+            </Grid>
+            <Grid item xs={10} md={6}>
+              <RedirectionRules rules={this.state.rules} selected={this.state.selected} selectedDestructively={this.state.selectedDestructively} />
+            </Grid>
+          </Grid>
+        </Grid>
+      </MuiThemeProvider>
     );
   }
 }
 
-export default App;
+export default withStyles(styles)(App);
