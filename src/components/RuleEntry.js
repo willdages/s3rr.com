@@ -27,7 +27,7 @@ class RuleEntry extends Component {
     permanent: true,
     from: '',
     to: '',
-    toInput: ''
+    toInput: 'https://'
   }
 
   static defaultProps = {
@@ -36,33 +36,48 @@ class RuleEntry extends Component {
 
   constructor (props) {
     super(props);
-    this.state = this.blankRule;
+    this.state = {
+      rule: this.blankRule,
+      errorMessage: ''
+    };
   }
 
   handleSubmit = (e) => {
     e.preventDefault();
-    this.props.onAddRule(this.state);
-    this.setState(this.blankRule);
+    if (!this.state.rule.url) {
+      this.setState({
+        errorMessage: 'Please include the full domain, including http/https and www subdomain if applicable. For example: https://s3rr.com/destination'
+      });
+      return false;
+    }
+    this.props.onAddRule(this.state.rule);
+    this.setState({
+      rule: {
+        ...this.blankRule,
+        toInput: this.state.rule.protocol === 'https' ? 'https://' : 'http://'
+      }
+    });
     this.fromInput.focus();
   }
 
   handleToChange = (e) => {
     let url = e.target.value;
-    console.log(url)
     let parsed = parse(url);
     if (parsed.hostname === 'localhost' && e.target.value.indexOf('localhost') === -1) {
       parsed.hostname = '';
     }
     if (/^(\/h|\/ht|\/htt|\/http|\/https|\/https:|\/http:|\/https:\/|\/http:\/)/.test(parsed.pathname) && parsed.pathname.length <= 8) {
-      console.log(true);
       parsed.pathname = '';
     }
     this.setState({
-      ...this.state,
-      protocol: parsed.protocol.replace(/:/g, ''),
-      url: parsed.hostname,
-      to: parsed.pathname + parsed.query,
-      toInput: url
+      rule: {
+        ...this.state.rule,
+        protocol: parsed.protocol.replace(/:/g, ''),
+        url: parsed.hostname,
+        to: parsed.pathname + parsed.query,
+        toInput: url
+      }
+
     })
   }
 
@@ -80,14 +95,14 @@ class RuleEntry extends Component {
                 placeholder="/campaign"
                 label="From"
                 autoFocus
-                value={this.state.from}
+                value={this.state.rule.from}
                 className={classes.textField}
                 helperText="The path inside your S3 bucket"
                 margin="normal"
                 fullWidth
                 required
                 inputRef={(el) => {this.fromInput = el}}
-                onChange={(e) => {this.setState({ ...this.state, from: e.target.value} )}}
+                onChange={(e) => {this.setState({ rule: { ...this.state.rule, from: e.target.value } })}}
               />
             </Grid>
             <Hidden smDown>
@@ -100,11 +115,12 @@ class RuleEntry extends Component {
                 placeholder="https://example.com/special"
                 label="To"
                 className={classes.textField}
-                helperText="Include the entire domain"
+                helperText={this.state.errorMessage.length ? this.state.errorMessage : "Include the entire domain" }
+                error={this.state.errorMessage.length > 0}
                 margin="normal"
                 fullWidth
                 required
-                value={this.state.toInput}
+                value={this.state.rule.toInput}
                 onChange={this.handleToChange}
               />
             </Grid>

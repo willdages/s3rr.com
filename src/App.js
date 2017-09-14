@@ -55,21 +55,18 @@ class App extends Component {
   }
 
   handleHover = (rule) => {
-    console.log('hover')
     this.setState({
       selected: rule
     });
   }
 
   handleUnHover = () => {
-    console.log('unhover')
     this.setState({
       selected: {}
     });
   }
 
   handleHoverDestructive = (rule) => {
-    console.log('hoverd')
     this.setState({
       selected: rule,
       selectedDestructively: true
@@ -77,7 +74,6 @@ class App extends Component {
   }
 
   handleUnHoverDestructive = () => {
-    console.log('unhoverd')
     this.setState({
       selected: {},
       selectedDestructively: false
