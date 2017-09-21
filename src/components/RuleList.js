@@ -1,13 +1,7 @@
 import React, { Component } from 'react';
 import { withStyles } from 'material-ui/styles';
-import List, {
-  ListItem,
-  ListItemSecondaryAction,
-  ListItemText,
-  ListSubheader,
-} from 'material-ui/List';
-import IconButton from 'material-ui/IconButton';
-import DeleteIcon from 'material-ui-icons/Delete';
+import RuleListItem from './RuleListItem';
+import List from 'material-ui/List';
 
 const styles = theme => ({
   root: {
@@ -22,24 +16,22 @@ class RuleList extends Component {
     onRemoveRule: () => {}
   }
 
+  constructor (props) {
+    super(props);
+    this.state = {
+      copied: false
+    }
+  }
+
   render() {
     const { classes } = this.props;
-    if (!this.props.rules.length) {
-      return <div className={classes.root}></div>;
-    }
+    // if (!this.props.rules.length) {
+    //   return <div className={classes.root}></div>;
+    // }
     return (
       <div className={classes.root}>
-        <List subheader={<ListSubheader>Rules</ListSubheader>}>
-          {this.props.rules.map(rule => (
-            <ListItem key={rule.from} style={{cursor: 'pointer'}} onMouseLeave={this.props.onUnHighlight.bind(this, rule)} onMouseEnter={this.props.onHighlight.bind(this, rule)}>
-              <ListItemText primary={`${rule.from} --> ${rule.to}`} />
-              <ListItemSecondaryAction>
-                <IconButton aria-label="Delete" onClick={event => this.props.onRemoveRule(rule)} onMouseLeave={this.props.onUnHighlightDestructively.bind(this, rule)} onMouseEnter={this.props.onHighlightDestructively.bind(this, rule)}>
-                  <DeleteIcon />
-                </IconButton>
-              </ListItemSecondaryAction>
-            </ListItem>
-          ))}
+        <List subheader={<h5>Rules</h5>}>
+          {this.props.rules.length ? this.props.rules.map(rule => <RuleListItem rule={rule} key={rule.from} {...this.props} />) : null}
         </List>
       </div>
     );

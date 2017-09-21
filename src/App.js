@@ -27,8 +27,7 @@ class App extends Component {
     super(props);
     this.state = {
       rules: [],
-      selected: {},
-      selectedDestructively: false
+      selected: {}
     }
   }
 
@@ -49,8 +48,7 @@ class App extends Component {
     newRules.splice(currentIndex, 1);
     this.setState({
       rules: newRules,
-      selected: {},
-      selectedDestructively: false
+      selected: {}
     });
   }
 
@@ -66,20 +64,6 @@ class App extends Component {
     });
   }
 
-  handleHoverDestructive = (rule) => {
-    this.setState({
-      selected: rule,
-      selectedDestructively: true
-    });
-  }
-
-  handleUnHoverDestructive = () => {
-    this.setState({
-      selected: {},
-      selectedDestructively: false
-    });
-  }
-
   render() {
     return (
       <MuiThemeProvider theme={theme}>
@@ -90,12 +74,20 @@ class App extends Component {
               <RuleEntry onAddRule={this.handleAddRule} />
             </Grid>
           </Grid>
-          <Grid container spacing={0} style={{paddingBottom: '2em'}} justify="center">
+          <Grid container spacing={0} style={{paddingBottom: '2em', marginBottom: '6em'}} justify="center">
             <Grid item xs={10} md={4}>
-              <RuleList rules={this.state.rules} onHighlight={this.handleHover} onUnHighlight={this.handleUnHover} onUnHighlightDestructively={this.handleUnHoverDestructive} onHighlightDestructively={this.handleHoverDestructive} onRemoveRule={this.handleRemoveRule} />
+              <RuleList rules={this.state.rules} onHighlight={this.handleHover} onUnHighlight={this.handleUnHover} onRemoveRule={this.handleRemoveRule} />
             </Grid>
             <Grid item xs={10} md={6}>
-              <RedirectionRules rules={this.state.rules} selected={this.state.selected} selectedDestructively={this.state.selectedDestructively} />
+              <RedirectionRules rules={this.state.rules} selected={this.state.selected} />
+            </Grid>
+          </Grid>
+          <Grid container spacing={0} style={{padding: '4em 2em', backgroundColor: 'darkGrey', color: 'white'}} justify="center">
+            <Grid item xs={12}>
+              <footer>
+                <p>Built with love by <a href="https://twitter.com/willdages">Will Dages</a>.</p>
+                <p>All code is open source with the MIT license: <a href="https://github.com/willdages/s3rr.com/">Github</a>.</p>
+              </footer>
             </Grid>
           </Grid>
         </Grid>
